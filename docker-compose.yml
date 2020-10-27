@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+  nginx:
+    container_name: cart_api
+    image: nginx:stable
+    ports:
+      - 8086:80
+      - 4433:443
+    working_dir: /app
+    volumes:
+    - .:/app
+    - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+
+  php:
+    container_name: cart_php_api
+    build: ./docker/php
+    working_dir: /app
+    volumes:
+    - .:/app
+    - ./docker/php/php.ini:/usr/local/etc/conf.d/custom.ini
+    - $HOME/.composer/cache:/root/.composer/cache
+
+  php_ide_unit:
+    container_name: cart_php_api_unit
+    build: ./docker/php
+    working_dir: /app
+    volumes:
+      - .:/app
+      - ./docker/php/php.ini:/usr/local/etc/conf.d/custom.ini
+      - $HOME/.composer/cache:/root/.composer/cache

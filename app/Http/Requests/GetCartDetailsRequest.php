@@ -40,7 +40,7 @@ class GetCartDetailsRequest extends FormRequest
     {
         return [
             'cart_id' => 'bail|required|filled'
-        ];
+];
     }
 
     public function getCart()

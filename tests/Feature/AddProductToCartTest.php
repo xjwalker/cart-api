@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Gateway\ProductsGateway;
 use App\Models\Cart;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\CartTestUtils;
@@ -17,10 +16,7 @@ class AddProductToCartTest extends TestCase
     {
         $products = [100, 101, 102];
 
-        $jsonStub = $this->loadJson('tests/Stubs/GetProducts.json');
-        $this->mock(ProductsGateway::class, function ($mock) use ($products, $jsonStub) {
-            $mock->shouldReceive()->getProducts($products)->once()->andReturn($jsonStub);
-        });
+        $this->setProductGatewayGetProducts($products);
         $this->createProducts();
 
         /** @var Cart $c */
@@ -68,10 +64,7 @@ class AddProductToCartTest extends TestCase
         $c = Cart::factory()->create();
 
         $products = [100, 104];
-        $jsonStub = $this->loadJson('tests/Stubs/GetSingleProduct.json');
-        $this->mock(ProductsGateway::class, function ($mock) use ($products, $jsonStub) {
-            $mock->shouldReceive()->getProducts($products)->once()->andReturn($jsonStub);
-        });
+        $this->setProductGatewayGetSingleProduct($products);
 
         $d = [
             'cart_id' => $c->id,

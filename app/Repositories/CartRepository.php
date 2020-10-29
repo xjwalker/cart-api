@@ -55,9 +55,24 @@ class CartRepository
         ]);
     }
 
-    public function getProductFromCart($cartId, $productIds)
+    /**
+     * @param $cartId
+     * @param $productIds
+     * @return \Illuminate\Support\Collection
+     */
+    public function getProductsByCartAndProductId($cartId, $productIds)
     {
         return $this->getStatement($cartId, $productIds)->get();
+    }
+
+    /**
+     * @param $cartId
+     * @return \Illuminate\Support\Collection
+     */
+    public function getProductsFromCart($cartId)
+    {
+        return DB::table('cart_products')->where('cart_id', $cartId)
+            ->orderBy('id', 'desc')->get();
     }
 
     /**

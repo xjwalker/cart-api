@@ -23,7 +23,7 @@ class RemoveProduct
     public function remove($cart, $productsToDelete)
     {
         $ids = $productsToDelete->pluck('id')->toArray();
-        $productsInCart = $this->cartRepository->getProductFromCart($cart->id, $ids);
+        $productsInCart = $this->cartRepository->getProductsByCartAndProductId($cart->id, $ids);
 
         $recordsToDelete = [];
         $productsToDelete->each(function ($product) use ($productsInCart, &$recordsToDelete) {

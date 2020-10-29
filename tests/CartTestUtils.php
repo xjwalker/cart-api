@@ -2,11 +2,14 @@
 
 namespace Tests;
 
+use App\Http\Gateway\ProductsGateway;
 use App\Repositories\CartRepository;
 use Illuminate\Support\Facades\DB;
 
 trait CartTestUtils
 {
+    private $productMock;
+
     private function createProducts()
     {
         return \Illuminate\Support\Facades\DB::table('products')->insert([
@@ -49,5 +52,36 @@ trait CartTestUtils
         for ($i = 0; $i < 4; $i++) {
             $cartRepository->addProductToCart($cartId, $thirdProduct->id);
         }
+    }
+
+    private function getProductMockBuilder()
+    {
+        if (empty($this->productMock)) {
+            $this->productMock = $this->createMock(ProductsGateway::class);
+            $this->app->instance(ProductsGateway::class, $this->productMock);
+        }
+        return $this->productMock;
+    }
+
+    private function setProductGatewayGetProducts($products)
+    {
+        $jsonStub = $this->loadJson('tests/Stubs/GetProducts.json');
+
+        $this->getProductMockBuilder()
+            ->expects($this->once())
+            ->method('getProducts')
+            ->with($products)
+            ->willReturn($jsonStub);
+    }
+
+    private function setProductGatewayGetSingleProduct($products)
+    {
+        $jsonStub = $this->loadJson('tests/Stubs/GetSingleProduct.json');
+
+        $this->getProductMockBuilder()
+            ->expects($this->once())
+            ->method('getProducts')
+            ->with($products)
+            ->willReturn($jsonStub);
     }
 }

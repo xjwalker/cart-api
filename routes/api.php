@@ -21,6 +21,8 @@ Route::group(['prefix' => 'cart'], function () {
 
     Route::post('/add-product', [CartController::class, 'addProduct']);
     Route::delete('/remove-product', [CartController::class, 'removeProduct']);
+    Route::get('/details', [CartController::class, 'getCartDetails']);
+
 });
 
 

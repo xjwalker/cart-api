@@ -61,7 +61,7 @@ class RemoveProductFromCartRequest extends FormRequest
             }
 
             $ids = $products->pluck('id')->toArray();
-            $productsInCart = $this->cartRepository->getProductFromCart($data['cart_id'], $ids)->count();
+            $productsInCart = $this->cartRepository->getProductsByCartAndProductId($data['cart_id'], $ids)->count();
             if ($productsInCart < $products->count()) {
                 throw new ValidationRuleException('products', 'cart_product_does_not_match');
             }

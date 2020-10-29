@@ -56,7 +56,7 @@ class AddProductToCartRequest extends FormRequest
             // Make sure cart exists
             $cart = $this->cartRepository->getById($data['cart_id']);
             if (is_null($cart)) {
-                throw new ValidationRuleException('cart_id', 'exits');
+                throw new ValidationRuleException('cart_id', 'exists');
             }
 
             // make sure all the products exist.
@@ -70,11 +70,14 @@ class AddProductToCartRequest extends FormRequest
 
             // make sure he doesn't buy more than 10 times the same product.
             if ($productsCollection->where('amount', '>', 10)->first()) {
-                throw new ValidationRuleException('product', 'cart_product_amount_limit');
+                throw new ValidationRuleException('products', 'cart_product_amount_limit');
             }
 
             // if the amount is 0, ignore the product.
-            $gatewayProducts = $this->productGateway->getProducts($p);
+            $gatewayProducts = Collect($this->productGateway->getProducts($p));
+            if (count($p) > $gatewayProducts->count()) {
+                throw new ValidationRuleException('products', 'products_does_not_match');
+            }
 
             $this->request->add([
                 'cart' => $cart,

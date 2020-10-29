@@ -13,5 +13,14 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::group(['prefix' => 'cart'], function () {
 
-Route::post('/cart/add-product', [CartController::class, 'addProduct']);
+    Route::post('/', [CartController::class, 'createCart']);
+    Route::get('/', [CartController::class, 'getCarts']);
+    Route::delete('/', [CartController::class, 'deleteCart']);
+
+    Route::post('/add-product', [CartController::class, 'addProduct']);
+    Route::delete('/remove-product', [CartController::class, 'removeProduct']);
+});
+
+

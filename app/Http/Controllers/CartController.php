@@ -4,28 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Http\Gateway\ProductsGateway;
 use App\Http\Requests\AddProductToCartRequest;
+use App\Http\Requests\RemoveProductFromCartRequest;
 use App\Repositories\CartRepository;
+use App\UseCases\AddProduct;
+use App\UseCases\RemoveProduct;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
+    /** @var AddProduct */
+    private $addProduct;
     /** @var CartRepository */
     private $cartRepository;
-
-    /**
-     * @var ProductsGateway
-     */
+    /**@var ProductsGateway */
     private $productGateway;
+    /** @var RemoveProduct */
+    private $removeProduct;
 
     /**
      * CartController constructor.
+     * @param AddProduct $addProduct
      * @param CartRepository $cartRepository
      * @param ProductsGateway $productGateway
+     * @param RemoveProduct $removeProduct
      */
-    public function __construct(CartRepository $cartRepository, ProductsGateway $productGateway)
+    public function __construct(
+        AddProduct $addProduct,
+        CartRepository $cartRepository,
+        ProductsGateway $productGateway,
+        RemoveProduct $removeProduct
+    )
     {
+        $this->addProduct = $addProduct;
         $this->cartRepository = $cartRepository;
         $this->productGateway = $productGateway;
+        $this->removeProduct = $removeProduct;
     }
 
     public function createCart()
@@ -51,32 +64,25 @@ class CartController extends Controller
 
     /**
      * @param AddProductToCartRequest $request
-     * @return array
+     * @return \Illuminate\Http\JsonResponse
      */
     public function addProduct(AddProductToCartRequest $request)
     {
         $cart = $request->get('cart');
         $products = $request->get('products');
-        $gatewayProducts = Collect($request->get('gatewayProducts'));
+        $gatewayProducts = $request->get('gatewayProducts');
 
-        $result = $products->map(function ($product) use ($cart, $gatewayProducts) {
-            $currentProduct = $gatewayProducts->where('id', $product['id'])->first();
-            for ($i = 0; $i < $product['amount']; $i++) {
-                $this->cartRepository->addProductToCart($cart, $product);
-            }
+        return response()->json(['data' => $this->addProduct->add($cart, $products, $gatewayProducts)]);
+    }
 
-            return [
-                'id' => $product['id'],
-                'title' => $currentProduct['title'],
-                'individual_price' => $currentProduct['price'],
-                'amount' => $product['amount'] * $currentProduct['price'],
-            ];
-        });
+    /**
+     * @param RemoveProductFromCartRequest $request
+     * @return \Illuminate\Http\Response
+     */
+    public function removeProduct(RemoveProductFromCartRequest $request)
+    {
+        $this->removeProduct->remove($request->get('cart'), $request->get('products'));
 
-        return [
-            'cart_id' => $cart->id,
-            'total' => $result->sum('amount'),
-            'products' => $result,
-        ];
+        return response('', 204);
     }
 }

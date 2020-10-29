@@ -11,8 +11,6 @@ class ProductsGateway
 {
     private const METHOD_GET = 'GET';
 
-    private const METHOD_POST = 'POST';
-
     /**
      * @var string
      */

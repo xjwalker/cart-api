@@ -43,15 +43,53 @@ class CartRepository
     }
 
     /**
-     * @param $cart
-     * @param $product
+     * @param $cartId
+     * @param $productId
      * @return bool
      */
-    public function addProductToCart($cart, $product)
+    public function addProductToCart($cartId, $productId)
     {
         return DB::table('cart_products')->insert([
-            'cart_id' => $cart->id,
-            'product_id' => $product['id'],
+            'cart_id' => $cartId,
+            'product_id' => $productId,
         ]);
     }
+
+    public function getProductFromCart($cartId, $productIds)
+    {
+        return $this->getStatement($cartId, $productIds)->get();
+    }
+
+    /**
+     * @param $cartId
+     * @param $productIds
+     * @param null $amount
+     * @return int
+     */
+    public function removeProductsFromCart($cartId, $productIds, $amount = null)
+    {
+        return $this->getStatement($cartId, $productIds, $amount)->delete();
+    }
+
+    /**
+     * @param $cartId
+     * @param $productIds
+     * @param $limit
+     * @return \Illuminate\Database\Query\Builder
+     */
+    private function getStatement($cartId, $productIds, $limit = null)
+    {
+        $query = DB::table('cart_products')->where('cart_id', $cartId);
+        if (is_int($productIds)) {
+            $query->where('product_id', $productIds);
+        } else {
+            $query->whereIn('product_id', $productIds);
+        }
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+        return $query;
+    }
+
 }
